@@ -4,6 +4,8 @@ public class Voiture extends Thread {
     Instructions listeInstructions;
     String instruction;
     Circuit circuit;
+    boolean isParked = false;
+
     public Voiture(int id, Instructions listeInstructions, Circuit circuit) {
         this.id = id;
         this.listeInstructions = listeInstructions;
@@ -25,9 +27,18 @@ public class Voiture extends Thread {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            if(isParked) circuit.updateParkTime(this, timeToSleep);
         }
     }
-    
+
+    public boolean isParked() {
+        return isParked;
+    }
+
+    public void setParked(boolean parked) {
+        isParked = parked;
+    }
+
     @Override
     public String toString() {
         return "Voiture" + id;

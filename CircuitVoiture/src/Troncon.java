@@ -19,6 +19,14 @@ public class Troncon extends Case {
         return next;
     }
 
+    public boolean isAccesParking() {
+        return accesParking;
+    }
+
+    public long getDureeDeTraversee() {
+        return dureeDeTraversee;
+    }
+
     @Override
     public String toString() {
         return "Troncon" + id;

@@ -24,6 +24,8 @@ public class Main {
     public void init() {
         circuit = new Circuit();
 
+
+
         Troncon t1 = new Troncon(1, null, false, 4);
         Troncon t2 = new Troncon(2, null, false, 3);
         Troncon t3 = new Troncon(3, null, true, 6);
@@ -36,6 +38,12 @@ public class Main {
         Feu f3 = new Feu(3,t2, t1, t5, true);
         Feu f4 = new Feu(4,t1, t3, t2, false);
 
+        f1.setOposite(f3);
+        f3.setOposite(f1);
+        f2.setOposite(f2);
+        f4.setOposite(f4);
+
+
         t1.setNext(f1);
         t2.setNext(f2);
         t3.setNext(t6);
@@ -45,36 +53,46 @@ public class Main {
 
         Parking park =  new Parking(t4,t6);
 
-        Queue<String> queue1 = new LinkedList<>(Arrays.asList("left", "right", "park 10", "straight-on"));
-        Instructions instructions1 = new Instructions(queue1, new Supplier<Queue<String>>() {
+        park.setNbPlace(5);
+        circuit.setParking(park);
+        Queue<Optional<String>> queue1 = new LinkedList<>(Arrays.asList(Optional.of("left"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
+        Instructions instructions1 = new Instructions(queue1, new Supplier<Queue<Optional<String>>>() {
             @Override
-            public Queue<String> get() {
-                return new LinkedList<>(Arrays.asList("left", "right", "park 10", "straight-on"));
+            public Queue<Optional<String>> get() {
+                return new LinkedList<>(Arrays.asList(Optional.of("left"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
             }
         });
 
-        Queue<String> queue2 = new LinkedList<>(Arrays.asList("right", "left", "straight-on", "left"));
+      /*  Queue<String> queue2 = new LinkedList<>(Arrays.asList("right", "left", "straight-on", "left"));
         Instructions instructions2 = new Instructions(queue2, new Supplier<Queue<String>>() {
             @Override
             public Queue<String> get() {
                 return new LinkedList<String>(Arrays.asList("END_OF_STREAM"));
             }
+        });*/
+        Queue<Optional<String>> queue2 = new LinkedList<>(Arrays.asList(Optional.of("straight-on"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
+        Instructions instructions2 = new Instructions(queue2, new Supplier<Queue<Optional<String>>>() {
+            @Override
+            public Queue<Optional<String>> get() {
+                return new LinkedList<>(Arrays.asList(Optional.of("straight-on"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
+            }
         });
 
-        Voiture v1 = new Voiture(1,instructions1 , circuit);
-        Voiture v2 = new Voiture(2,instructions1 , circuit);
-        Voiture v3 = new Voiture(3, instructions2, circuit);
-        Voiture v4 = new Voiture(4, instructions2, circuit);
 
-        circuit.ajoutVoiture(v1, park);
-        circuit.ajoutVoiture(v2, park);
-        circuit.ajoutVoiture(v3, park);
-        circuit.ajoutVoiture(v4, park);
+        Voiture v1 = new Voiture(1,instructions1 , circuit);
+        Voiture v2 = new Voiture(2,instructions2 , circuit);
+        //Voiture v3 = new Voiture(3, instructions2, circuit);
+        //Voiture v4 = new Voiture(4, instructions2, circuit);
+
+        circuit.ajoutVoiture(v1, f1);
+        circuit.ajoutVoiture(v2, f3);
+       //  circuit.ajoutVoiture(v3, park);
+       // circuit.ajoutVoiture(v4, park);
 
         voitures.add(v1);
         voitures.add(v2);
-        voitures.add(v3);
-        voitures.add(v4);
+        // voitures.add(v3);
+        //voitures.add(v4);
 
         circuit.ajoutFeu(f1);
         circuit.ajoutFeu(f2);

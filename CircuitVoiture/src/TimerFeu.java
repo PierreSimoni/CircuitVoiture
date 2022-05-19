@@ -4,7 +4,7 @@ public class TimerFeu extends Thread{
 
     public TimerFeu(Circuit circuit) {
         this.circuit = circuit;
-        stop =true;
+        stop = true;
     }
 
     public void run(){

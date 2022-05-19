@@ -5,6 +5,16 @@ public class Feu extends Case {
     Case right;
     Case straightOn;
 
+    Case oposite;
+
+    public Case getOposite() {
+        return oposite;
+    }
+
+    public void setOposite(Case oposite) {
+        this.oposite = oposite;
+    }
+
     public boolean green;
 
     public Feu(int id, Case left, Case right, Case straightOn, boolean green) {
