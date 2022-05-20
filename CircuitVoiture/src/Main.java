@@ -22,26 +22,28 @@ public class Main {
     TimerFeu timerFeu;
 
     public void init() {
+
+        //Creation du circuit
         circuit = new Circuit();
 
 
-
+        //Définition des tronçons
         Troncon t1 = new Troncon(1, null, false, 4);
         Troncon t2 = new Troncon(2, null, false, 3);
         Troncon t3 = new Troncon(3, null, true, 6);
         Troncon t4 = new Troncon(4, null, false, 5);
         Troncon t5 = new Troncon(5, null, true, 6);
         Troncon t6 = new Troncon(6, null, false, 7);
-
-        Feu f1 = new Feu(1,t3, t1, t5, true);
-        Feu f2 = new Feu(2,t5, t2, t3, false);
-        Feu f3 = new Feu(3,t2, t1, t5, true);
-        Feu f4 = new Feu(4,t1, t3, t2, false);
+        //Définition des feu
+        Feu f1 = new Feu(1,t5, t1, t3, true);
+        Feu f2 = new Feu(2,t2, t3, t5, false);
+        Feu f3 = new Feu(3,t1, t5, t2, true);
+        Feu f4 = new Feu(4,t3, t2, t1, false);
 
         f1.setOposite(f3);
         f3.setOposite(f1);
-        f2.setOposite(f2);
-        f4.setOposite(f4);
+        f2.setOposite(f4);
+        f4.setOposite(f2);
 
 
         t1.setNext(f1);
@@ -50,11 +52,14 @@ public class Main {
         t4.setNext(f3);
         t5.setNext(t4);
         t6.setNext(f4);
+        //Définition su Parking
+        Parking park =  new Parking(t6,t4);
 
-        Parking park =  new Parking(t4,t6);
-
-        park.setNbPlace(5);
+        park.setNbPlace(0);
         circuit.setParking(park);
+
+
+        //Création des streams d'instructions
         Queue<Optional<String>> queue1 = new LinkedList<>(Arrays.asList(Optional.of("left"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
         Instructions instructions1 = new Instructions(queue1, new Supplier<Queue<Optional<String>>>() {
             @Override
@@ -70,29 +75,34 @@ public class Main {
                 return new LinkedList<String>(Arrays.asList("END_OF_STREAM"));
             }
         });*/
-        Queue<Optional<String>> queue2 = new LinkedList<>(Arrays.asList(Optional.of("straight-on"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
+        Queue<Optional<String>> queue2 = new LinkedList<>(Arrays.asList(Optional.of("straight-on"), Optional.of("left"), Optional.of("park 3"), Optional.of("right")));
         Instructions instructions2 = new Instructions(queue2, new Supplier<Queue<Optional<String>>>() {
             @Override
             public Queue<Optional<String>> get() {
-                return new LinkedList<>(Arrays.asList(Optional.of("straight-on"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
+                return new LinkedList<>(Arrays.asList(Optional.of("straight-on"), Optional.of("left"), Optional.of("park 3"), Optional.of("right")));
+            }
+        });
+        Queue<Optional<String>> queue3 = new LinkedList<>(Arrays.asList(Optional.of("right"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
+        Instructions instructions3 = new Instructions(queue3, new Supplier<Queue<Optional<String>>>() {
+            @Override
+            public Queue<Optional<String>> get() {
+                return new LinkedList<>(Arrays.asList(Optional.of("right"), Optional.of("right"), Optional.of("park 3"), Optional.of("straight-on")));
             }
         });
 
-
+        //Définition des voitures
         Voiture v1 = new Voiture(1,instructions1 , circuit);
-        Voiture v2 = new Voiture(2,instructions2 , circuit);
-        //Voiture v3 = new Voiture(3, instructions2, circuit);
-        //Voiture v4 = new Voiture(4, instructions2, circuit);
-
-        circuit.ajoutVoiture(v1, f1);
-        circuit.ajoutVoiture(v2, f3);
-       //  circuit.ajoutVoiture(v3, park);
-       // circuit.ajoutVoiture(v4, park);
-
+        Voiture v3 = new Voiture(3, instructions3, circuit);
+        Voiture v4 = new Voiture(4, instructions2, circuit);
+        //On place les voitures sur le circuit
+        circuit.ajoutVoiture(v1, park);
+        circuit.ajoutVoiture(v3, park);
+        circuit.ajoutVoiture(v4, park);
+        
         voitures.add(v1);
-        voitures.add(v2);
-        // voitures.add(v3);
-        //voitures.add(v4);
+        voitures.add(v3);
+
+        voitures.add(v4);
 
         circuit.ajoutFeu(f1);
         circuit.ajoutFeu(f2);

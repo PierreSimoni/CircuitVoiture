@@ -1,6 +1,12 @@
+/**
+ * Classe simulant le comportement d'une voiture sur le circuit
+ */
 public class Voiture extends Thread {
 
     int id;
+    /**
+     * Instructions suivi par la voiture
+     */
     Instructions listeInstructions;
     String instruction;
     Circuit circuit;
@@ -11,7 +17,9 @@ public class Voiture extends Thread {
         this.listeInstructions = listeInstructions;
         this.circuit = circuit;
     }
-
+    /**
+     * Simulation du comportment d'une voiture , intéraction avec le circuit
+     */
     public void run() {
         while(true) {
             //recupérer l'instruction

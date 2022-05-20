@@ -21,13 +21,21 @@ public class Circuit {
 
     Parking parking;
 
+    /**
+     * Récupère une voiture et son instruction et l'applique dans le circuit actuel
+     * @param voiture
+     * @param instruction
+     * @return boolean qui dit a la voiture qu'elle peut exécuter l'instruction
+     */
+
     public synchronized boolean passInstruction(Voiture voiture, String instruction) {
         Case positionActuelle = positions.get(voiture);
 
-        if(timesToPark.getOrDefault(voiture, 0l) > 0){
+        if (timesToPark.getOrDefault(voiture, 0l)>0){
             tryToPark(voiture);
-            return false;
         }
+
+
 
         switch(instruction) {
             case "END_OF_STREAM":
@@ -49,6 +57,11 @@ public class Circuit {
         }
     }
 
+    /**
+     * Donne a voiture le temps de sleep avant sa prochaine action
+     * @param voiture
+     * @return le temps de sleep pour la voiture
+     */
     public synchronized long getTimeToSleep(Voiture voiture) {
         Case positionVoiture = positions.get(voiture);
 
@@ -62,6 +75,11 @@ public class Circuit {
         return 0;
     }
 
+    /**
+     * Met a jour le temps que la voiture est resté sur le parking et sort la voiture si le temps est 0
+     * @param voiture
+     * @param timeSpendParked
+     */
     public synchronized void updateParkTime(Voiture voiture, long timeSpendParked) {
         Long oldTimeToPark = timesToPark.getOrDefault(voiture, 0l);
         System.out.println(voiture + " : oldTimeToPark " + oldTimeToPark);
@@ -73,30 +91,35 @@ public class Circuit {
             System.out.println(voiture + " voiture n'est plus garée (mais est toujours sur le parking)");
             voiture.setParked(false);
             // synchronized NbPlace ??
-            parking.incrNbPlace();
+
         }
     }
 
+    /**Gare la voiture et la déplace sur le parking return false si l'intruction echoue
+     * @param voiture
+     * @param instruction
+     * @return
+     */
     private boolean handleParkInstruction(Voiture voiture, String instruction) {
         if (voiture.isParked()) return false;
         instruction.trim();
         int timeToPark = Integer.valueOf(instruction.substring(5));
         Long oldTimeToPark = timesToPark.getOrDefault(voiture, 0l);
+        System.out.println(voiture + "Reçoit l'intruction de se garer");
+        timesToPark.put(voiture, oldTimeToPark + timeToPark);
+        tryToPark(voiture);
 
-        if (tryToPark(voiture)){
-            // synchronizied timesToPark ??
-            /*synchronized (timesToPark) {
-                timesToPark.put(voiture, oldTimeToPark + timeToPark);
-            }*/
-            timesToPark.put(voiture, oldTimeToPark + timeToPark);
-        }
         return true;
     }
 
+    /**
+     * Verifie si la voiture peut entrer dans le parking
+     * @param voiture
+     * @return boolean
+     */
     private boolean tryToPark(Voiture voiture) {
-
         Case positionVoiture = positions.get(voiture);
-        System.out.println(voiture + " essaie de se garer");
+
         if (!(positionVoiture instanceof Troncon)){
             return false;
         }
@@ -116,12 +139,17 @@ public class Circuit {
         return  false;
     }
 
+    /**
+     * Essaie de faire tourner la voiture sur la case left de laquelle la voiture se trouve
+     * @param voiture
+     * @return le résultat du déplacement , true siu réussi
+     * @throws InterruptedException
+     */
     private boolean handleLeft(Voiture voiture) throws InterruptedException {
         if(voiture.isParked()) return false;
 
         Case positionVoiture = positions.get(voiture);
 
-        System.out.println(voiture + " essaie de tourner à gauche ...");
 
         // on ne peut tourner que si l'on est sur un feu ou un parking
         if(positionVoiture instanceof Troncon) {
@@ -156,12 +184,13 @@ public class Circuit {
         }
 
         if(positionVoiture instanceof Parking) {
-            //...
+
             if(positions.values().stream().filter(c -> c instanceof Troncon).map(c -> (Troncon)c).anyMatch(troncon->troncon.accesParking)) {
-                System.out.println(voiture + " laisse la priorité aux voitures avant de sortir du parking.");
+
                 return false;
             }
             Case positionSuivante = ((Parking)positionVoiture).getLeft();
+            parking.incrNbPlace();
             positions.put(voiture, ((Parking)positionVoiture).getLeft());
             System.out.println(voiture + " sort du parking par la gauche");
             System.out.println(voiture + " est maintenant sur la case " + positionSuivante);
@@ -171,12 +200,18 @@ public class Circuit {
         return false;
     }
 
+    /**
+     * Essaie de faire tourner la voiture sur la case right de laquelle la voiture se trouve
+     * @param voiture
+     * @return le résultat du déplacement , true siu réussi
+     * @throws InterruptedException
+     */
     private boolean handleRight(Voiture voiture) {
         if(voiture.isParked()) return false;
 
         Case positionVoiture = positions.get(voiture);
 
-        System.out.println(voiture + " essaie de tourner à droite ...");
+
 
         // on ne peut tourner que si l'on est sur un feu ou un parking
         if(positionVoiture instanceof Troncon) {
@@ -209,9 +244,10 @@ public class Circuit {
 
         if(positionVoiture instanceof Parking) {
             if(positions.values().stream().filter(c -> c instanceof Troncon).map(c -> (Troncon)c).anyMatch(troncon->troncon.accesParking)) {
-                System.out.println(voiture + " laisse la priorité aux voitures avant de sortir du parking.");
+
                 return false;
             }
+            parking.incrNbPlace();
             Case positionSuivante = ((Parking)positionVoiture).getStraightOrRight();
             positions.put(voiture, positionSuivante);
             System.out.println(voiture + " sort du parking par la droite");
@@ -221,13 +257,17 @@ public class Circuit {
 
         return false;
     }
-
+    /**
+     * Essaie de faire tourner la voiture sur la case StraightOn de laquelle la voiture se trouve
+     * @param voiture
+     * @return le résultat du déplacement , true siu réussi
+     * @throws InterruptedException
+     */
     private boolean handleStraightOn(Voiture voiture) {
         if(voiture.isParked()) return false;
 
         Case positionVoiture = positions.get(voiture);
 
-        System.out.println(voiture + " essaie d'aller tout droit");
 
         if(positionVoiture instanceof Troncon) {
             //deplacer la voiture sur la position suivante
@@ -259,9 +299,10 @@ public class Circuit {
         if(positionVoiture instanceof Parking) {
             //...
             if(positions.values().stream().filter(c -> c instanceof Troncon).map(c -> (Troncon)c).anyMatch(troncon->troncon.accesParking)) {
-                System.out.println(voiture + " laisse la priorité aux voitures avant de sortir du parking.");
+
                 return false;
             }
+            parking.incrNbPlace();
             Case positionSuivante = ((Parking)positionVoiture).getStraightOrRight();
             positions.put(voiture, positionSuivante);
             System.out.println(voiture + " sort du parking par la droite");
@@ -272,6 +313,9 @@ public class Circuit {
         return false;
     }
 
+    /**
+     * Change la du boolean isGreen pour chaque feu .
+     */
     public synchronized void switchFeu(){
         for (Feu feu: listeFeux) {
             feu.setGreen(!feu.isGreen());

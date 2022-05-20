@@ -1,7 +1,20 @@
+/**
+ * Morceau de route traversé par une voiture
+ */
 public class Troncon extends Case {
     int id;
+    /**
+     * le troncon permet il d'accéder a la case parking ?
+     */
     boolean accesParking;
+    /**
+     * Case atteinte après la traversé du tronçon
+     */
     Case next;
+
+    /**
+     * Durée de sleep pour traverser le tronçon
+     */
     long dureeDeTraversee;
 
     public Troncon(int id, Case next, boolean accesParking, long dureeDeTraversee) {

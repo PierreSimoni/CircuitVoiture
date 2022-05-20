@@ -1,3 +1,6 @@
+/**
+ * Thread servant a faire alterner la couleur des feux toutes les 5 s
+ */
 public class TimerFeu extends Thread{
     Circuit circuit;
     boolean stop;

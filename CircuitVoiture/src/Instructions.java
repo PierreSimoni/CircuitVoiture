@@ -3,6 +3,9 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+/**
+ * Simulation d'un stream infini avec des promises en java
+ */
 public class Instructions {
     Queue<Optional<String>> instructions;
     Supplier<Queue<Optional<String>>> getNextInstructions;

@@ -1,10 +1,22 @@
+/**
+ * Simule le fonctionement d'un feu bicolore rouge/vert
+ */
 public class Feu extends Case {
+
     int id;
+
+    /**
+     * Case ateignable a gauche, droite et en face  du feu
+     */
 
     Case left;
     Case right;
     Case straightOn;
 
+
+    /**
+     * Feu opposé a l'objet actuel sur le circuit
+     */
     Case oposite;
 
     public Case getOposite() {
